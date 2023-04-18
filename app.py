@@ -54,6 +54,22 @@ def headers():
         for key, value in headers.items():
             output.append(f'{key}: {value}')
         return '<br>'.join(output), 200, {'Content-Type': 'text/html'}
+    
+@app.route("/api/post", methods=["POST"])
+def post():
+    output = []
+    for key, value in request.form.items():
+        output.append(f"{key}: {value}")
+    output = "\n".join(output)
+
+    if request.args.get("format") == "json":
+        response = Response(output, content_type="application/json")
+    elif request.args.get("format") == "xml":
+        response = Response(output, content_type="application/xml")
+    else:
+        response = Response(f"<pre>{output}</pre>", content_type="text/html")
+
+    return response    
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=3000)
