@@ -34,6 +34,26 @@ def environment():
         response = Response(f"<br>\n".join(output), content_type="text/html")
 
     return response
+    
+@app.route('/api/headers')
+def headers():
+    headers = dict(request.headers)
+    format = request.args.get('format', 'html')
+
+    if format == 'json':
+        return headers, 200, {'Content-Type': 'application/json'}
+    elif format == 'xml':
+        root = ET.Element('headers')
+        for key, value in headers.items():
+            node = ET.SubElement(root, key)
+            node.text = value
+        xml_str = ET.tostring(root)
+        return Response(xml_str, content_type="text/xml")
+    else:
+        output = []
+        for key, value in headers.items():
+            output.append(f'{key}: {value}')
+        return '<br>'.join(output), 200, {'Content-Type': 'text/html'}
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=3000)
